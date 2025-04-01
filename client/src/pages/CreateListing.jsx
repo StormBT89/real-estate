@@ -1,15 +1,15 @@
-import { useState } from "react";
+import {useState} from "react";
 import {getStorage, uploadBytesResumable, ref, getDownloadURL} from 'firebase/storage';
 import {app} from '../firebase';
-import {useSelector} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {useSelector} from 'react-redux'
+import {useNavigate} from 'react-router-dom'
 
-export default function CreateListing() {
+export default function CreateListing() {    
     const {currentUser} = useSelector((state) => state.user);
     const navigate = useNavigate();
     const [files, setFiles] = useState([]);
     const [formData, setFormData] = useState({
-        imageURLs: [],
+        imageUrls: [],
         name: '',
         description: '',
         address: '',
@@ -29,7 +29,7 @@ export default function CreateListing() {
     console.log(formData);
 
     const handleImageSubmit = (e) => {
-        if (files.length > 0 && files.length + formData.imageURLs.length < 6) {
+        if (files.length > 0 && files.length + formData.imageUrls.length < 6) {
             setUploading(true);
             setImageUploadError(false);
             const promises = [];
@@ -38,7 +38,7 @@ export default function CreateListing() {
                 promises.push(storeImage(files[i]));
             }
             Promise.all(promises).then((urls) =>{
-                setFormData({...formData, imageURLs: formData.imageURLs.concat(urls),});
+                setFormData({...formData, imageUrls: formData.imageUrls.concat(urls),});
                 setImageUploadError(false);   
                 setUploading(false);             
             }).catch((err) => {
@@ -80,7 +80,7 @@ export default function CreateListing() {
     const handleRemoveImage = (index) => {
         setFormData({
             ...formData,
-            imageURLs: formData.imageURLs.filter((_,i) => i !== index),
+            imageUrls: formData.imageUrls.filter((_, i) => i !== index),
         })
     }
 
@@ -88,21 +88,21 @@ export default function CreateListing() {
         if (e.target.id === 'sale' || e.target.id === 'rent') {
             setFormData({
                 ...formData,
-              type: e.target.id  
+              type: e.target.id,
             });
         }  
 
         if (e.target.id === 'parking' || e.target.id === 'furnished' || e.target.id === 'offer') {
             setFormData({
                 ...formData,
-                [e.target.id]: e.target.checked
+                [e.target.id]: e.target.checked,
             })
         }
 
         if (e.target.type === 'number' || e.target.type === 'text' || e.target.type === 'textarea') {
             setFormData({
                 ...formData,
-                [e.target.id]: e.target.value
+                [e.target.id]: e.target.value,
             })
         }
     };
@@ -111,13 +111,13 @@ export default function CreateListing() {
         e.preventDefault(); 
 
         try {
-            if(formData.imageURLs.length < 1) return setError('Потребно е да се прикачи барем една фотографија.');
+            if(formData.imageUrls.length < 1) return setError('Потребно е да се прикачи барем една фотографија.');
             if(+formData.regularPrice < +formData.discountPrice) return setError('Редовната цена мора да биде поголема од намалената цена.');  
 
             setLoading(true);
             setError(false);
 
-            const res = await fetch('api/listing/create', {
+            const res = await fetch('/api/listing/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ export default function CreateListing() {
                     {uploading ? 'Се прикачува..' : 'Прикачи'}                
                 </div>
                 <p className="text-red-700">{imageUploadError && imageUploadError}</p>
-                {formData.imageURLs.length > 0 && formData.imageURLs.map((url, index) => (
+                {formData.imageUrls.length > 0 && formData.imageUrls.map((url, index) => (
                     <div key={url} className="flex justify-between p-3 border items-center">
                         <img src={url} alt="listing image" className="w-20 h-20 object-contain rounded-lg"></img>
                         <button type="button" onClick={() => handleRemoveImage(index)} className="p-3 text-red-700 rounded-lg hover:opacity-75">Избриши</button>
